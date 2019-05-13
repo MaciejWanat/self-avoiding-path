@@ -30,14 +30,15 @@
         {
             this.picCanvas = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.txtWidth = new System.Windows.Forms.TextBox();
-            this.txtHeight = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.txtPathLength = new System.Windows.Forms.TextBox();
             this.btnGenerate = new System.Windows.Forms.Button();
             this.lblResults = new System.Windows.Forms.Label();
             this.trkWalk = new System.Windows.Forms.TrackBar();
             this.lblWalkNum = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.lblTotal = new System.Windows.Forms.Label();
+            this.cbFixedSideSize = new System.Windows.Forms.CheckBox();
+            this.cbVisualize = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picCanvas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkWalk)).BeginInit();
             this.SuspendLayout();
@@ -46,7 +47,7 @@
             // 
             this.picCanvas.BackColor = System.Drawing.Color.White;
             this.picCanvas.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.picCanvas.Location = new System.Drawing.Point(222, 12);
+            this.picCanvas.Location = new System.Drawing.Point(240, 12);
             this.picCanvas.Name = "picCanvas";
             this.picCanvas.Size = new System.Drawing.Size(220, 220);
             this.picCanvas.TabIndex = 0;
@@ -57,40 +58,22 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 13);
+            this.label1.Size = new System.Drawing.Size(64, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Width:";
+            this.label1.Text = "Path length:";
             // 
-            // txtWidth
+            // txtPathLength
             // 
-            this.txtWidth.Location = new System.Drawing.Point(56, 12);
-            this.txtWidth.Name = "txtWidth";
-            this.txtWidth.Size = new System.Drawing.Size(42, 20);
-            this.txtWidth.TabIndex = 2;
-            this.txtWidth.Text = "4";
-            this.txtWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // txtHeight
-            // 
-            this.txtHeight.Location = new System.Drawing.Point(167, 12);
-            this.txtHeight.Name = "txtHeight";
-            this.txtHeight.Size = new System.Drawing.Size(42, 20);
-            this.txtHeight.TabIndex = 4;
-            this.txtHeight.Text = "4";
-            this.txtHeight.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(123, 15);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(41, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Height:";
+            this.txtPathLength.Location = new System.Drawing.Point(82, 12);
+            this.txtPathLength.Name = "txtPathLength";
+            this.txtPathLength.Size = new System.Drawing.Size(42, 20);
+            this.txtPathLength.TabIndex = 2;
+            this.txtPathLength.Text = "4";
+            this.txtPathLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(35, 47);
+            this.btnGenerate.Location = new System.Drawing.Point(35, 52);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(75, 23);
             this.btnGenerate.TabIndex = 5;
@@ -125,7 +108,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(116, 47);
+            this.button1.Location = new System.Drawing.Point(116, 52);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 9;
@@ -133,20 +116,53 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Terminate_Click);
             // 
+            // lblTotal
+            // 
+            this.lblTotal.AutoSize = true;
+            this.lblTotal.Location = new System.Drawing.Point(-2, 228);
+            this.lblTotal.Name = "lblTotal";
+            this.lblTotal.Size = new System.Drawing.Size(0, 13);
+            this.lblTotal.TabIndex = 10;
+            // 
+            // cbFixedSideSize
+            // 
+            this.cbFixedSideSize.AutoSize = true;
+            this.cbFixedSideSize.Checked = true;
+            this.cbFixedSideSize.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbFixedSideSize.Location = new System.Drawing.Point(140, 29);
+            this.cbFixedSideSize.Name = "cbFixedSideSize";
+            this.cbFixedSideSize.Size = new System.Drawing.Size(94, 17);
+            this.cbFixedSideSize.TabIndex = 11;
+            this.cbFixedSideSize.Text = "Fixed side size";
+            this.cbFixedSideSize.UseVisualStyleBackColor = true;
+            // 
+            // cbVisualize
+            // 
+            this.cbVisualize.AutoSize = true;
+            this.cbVisualize.Checked = true;
+            this.cbVisualize.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbVisualize.Location = new System.Drawing.Point(140, 11);
+            this.cbVisualize.Name = "cbVisualize";
+            this.cbVisualize.Size = new System.Drawing.Size(67, 17);
+            this.cbVisualize.TabIndex = 12;
+            this.cbVisualize.Text = "Visualize";
+            this.cbVisualize.UseVisualStyleBackColor = true;
+            // 
             // WalksForm
             // 
             this.AcceptButton = this.btnGenerate;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(454, 241);
+            this.ClientSize = new System.Drawing.Size(482, 241);
+            this.Controls.Add(this.cbVisualize);
+            this.Controls.Add(this.cbFixedSideSize);
+            this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.lblWalkNum);
             this.Controls.Add(this.trkWalk);
             this.Controls.Add(this.lblResults);
             this.Controls.Add(this.btnGenerate);
-            this.Controls.Add(this.txtHeight);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.txtWidth);
+            this.Controls.Add(this.txtPathLength);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.picCanvas);
             this.Name = "WalksForm";
@@ -162,14 +178,15 @@
 
         private System.Windows.Forms.PictureBox picCanvas;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtWidth;
-        private System.Windows.Forms.TextBox txtHeight;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtPathLength;
         private System.Windows.Forms.Button btnGenerate;
         private System.Windows.Forms.Label lblResults;
         private System.Windows.Forms.TrackBar trkWalk;
         private System.Windows.Forms.Label lblWalkNum;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label lblTotal;
+        private System.Windows.Forms.CheckBox cbFixedSideSize;
+        private System.Windows.Forms.CheckBox cbVisualize;
     }
 }
 

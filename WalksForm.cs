@@ -19,21 +19,20 @@ namespace SelfAvoidingPaths
         }
 
         private List<List<Point>> _walks;
-        private int _walkWidth, _walkHeight;
+        private int _pathLength;
         private CancellationTokenSource _cts;
 
         private async void BtnGenerate_Click(object sender, EventArgs e)
         {
             lblResults.Text = "Working...";
             lblWalkNum.Text = "";
+            lblTotal.Text = "";
             btnGenerate.Enabled = false;
             trkWalk.Visible = false;
             picCanvas.Image = null;
             Cursor = Cursors.WaitCursor;
-            Application.DoEvents();
 
-            _walkWidth = int.Parse(txtWidth.Text);
-            _walkHeight = int.Parse(txtHeight.Text);
+            _pathLength = int.Parse(txtPathLength.Text);
 
             var watch = new Stopwatch();
 
@@ -41,7 +40,7 @@ namespace SelfAvoidingPaths
             var ct = _cts.Token;
 
             watch.Start();
-            await Task.Run(() => _walks = FindWalks(_walkWidth, _walkHeight, ct)).ConfigureAwait(true);
+            await Task.Run(() => _walks = FindWalks(_pathLength, ct)).ConfigureAwait(true);
             watch.Stop();
 
             var noun = (_walks.Count == 1 ? " walk " : " walks ");
@@ -50,42 +49,46 @@ namespace SelfAvoidingPaths
                               watch.Elapsed.TotalSeconds.ToString("0.00") +
                               " seconds";
 
-            if (_walks.Count > 0)
+            lblTotal.Text = $"Total paths in coordinate system: {_walks.Count * 4}";
+
+            if (cbVisualize.Checked)
             {
-                DisplayWalk(0);
-                if (_walks.Count >= 1)
+                if (_walks.Count > 0)
                 {
-                    trkWalk.Maximum = _walks.Count - 1;
-                    trkWalk.Value = 0;
-                    trkWalk.Visible = true;
+                    DisplayWalk(0);
+                    if (_walks.Count >= 1)
+                    {
+                        trkWalk.Maximum = _walks.Count - 1;
+                        trkWalk.Value = 0;
+                        trkWalk.Visible = true;
+                    }
                 }
             }
 
+            _walks = new List<List<Point>>();
             btnGenerate.Enabled = true;
             Cursor = Cursors.Default;
         }
 
         // Generate all self-avoiding walks.
-        private List<List<Point>> FindWalks(int width, int height, CancellationToken ct)
+        private List<List<Point>> FindWalks(int pathLength, CancellationToken ct)
         {
-            List<List<Point>> walks = new List<List<Point>>();
+            var walks = new List<List<Point>>();
 
+            var side = pathLength + 1;
             // Make an array to show where we have been.
-            bool[,] visited = new bool[width + 1, height + 1];
-
-            // Get the number of points we need to visit.
-            int numPoints = (width + 1) * (height + 1);
+            var visited = new bool[side, side];
 
             // Start the walk at (0, 0).
-            Stack<Point> currentWalk = new Stack<Point>();
+            var currentWalk = new Stack<Point>();
             currentWalk.Push(new Point(0, 0));
             visited[0, 0] = true;
 
             try
             {
                 // Search for walks.
-                FindWalks(numPoints, walks, currentWalk,
-                    0, 0, width, height, visited, ct);
+                FindWalks(walks, currentWalk,
+                    0, 0, side, pathLength, visited, ct);
                 return walks;
             }
             catch (TaskCanceledException)
@@ -95,24 +98,22 @@ namespace SelfAvoidingPaths
         }
 
         // Extend the walk that is at (current_x, current_y).
-        private void FindWalks(int numPoints,
+        private void FindWalks(
             List<List<Point>> walks, Stack<Point> currentWalk,
             int currentX, int currentY,
-            int width, int height, bool[,] visited, CancellationToken ct)
+            int side, int pathLength, bool[,] visited, CancellationToken ct)
         {
             if (ct.IsCancellationRequested)
                 throw new TaskCanceledException();
 
-            // If we have visited every position,
-            // then this is a complete walk.
-            if (currentWalk.Count == numPoints)
+            if (currentWalk.Count == pathLength + 1)
             {
                 walks.Add(currentWalk.ToList());
             }
             else
             {
                 // Try the possible moves.
-                var nextPoints = new Point[]
+                var nextPoints = new[]
                 {
                     new Point(currentX - 1, currentY),
                     new Point(currentX + 1, currentY),
@@ -123,17 +124,17 @@ namespace SelfAvoidingPaths
                 foreach (var point in nextPoints)
                 {
                     if (point.X < 0) continue;
-                    if (point.X > width) continue;
+                    if (point.X > side) continue;
                     if (point.Y < 0) continue;
-                    if (point.Y > height) continue;
+                    if (point.Y > side) continue;
                     if (visited[point.X, point.Y]) continue;
 
                     // Try visiting this point.
                     visited[point.X, point.Y] = true;
                     currentWalk.Push(point);
 
-                    FindWalks(numPoints, walks, currentWalk,
-                        point.X, point.Y, width, height, visited, ct);
+                    FindWalks(walks, currentWalk,
+                        point.X, point.Y, side, pathLength, visited, ct);
 
                     // We're done visiting this point.
                     visited[point.X, point.Y] = false;
@@ -151,10 +152,21 @@ namespace SelfAvoidingPaths
         private void DisplayWalk(int walkNum)
         {
             lblWalkNum.Text = "Walk " + walkNum;
+            var walk = _walks[walkNum];
+
             using (Pen pen = new Pen(Color.Blue, 2))
             {
-                Bitmap bm = DrawWalk(_walks[walkNum],
-                    _walkWidth, _walkHeight,
+                var width = _pathLength;
+                var height = _pathLength;
+
+                if (!cbFixedSideSize.Checked)
+                {
+                    width = walk.OrderByDescending(item => item.X).First().X;
+                    height = walk.OrderByDescending(item => item.Y).First().Y;
+                }
+
+                var bm = DrawWalk(walk,
+                    width, height,
                     picCanvas.ClientSize.Width,
                     picCanvas.ClientSize.Height,
                     Color.White, Brushes.Green, pen);
