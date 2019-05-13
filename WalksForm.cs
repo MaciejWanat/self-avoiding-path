@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Threading.Tasks;
 
 namespace SelfAvoidingPaths
 {
@@ -19,7 +20,7 @@ namespace SelfAvoidingPaths
         private List<List<Point>> _walks;
         private int _walkWidth, _walkHeight;
 
-        private void BtnGenerate_Click(object sender, EventArgs e)
+        private async void BtnGenerate_Click(object sender, EventArgs e)
         {
             lblResults.Text = "Working...";
             lblWalkNum.Text = "";
@@ -29,19 +30,20 @@ namespace SelfAvoidingPaths
             Cursor = Cursors.WaitCursor;
             Application.DoEvents();
 
-            // Find the walks.
             _walkWidth = int.Parse(txtWidth.Text);
             _walkHeight = int.Parse(txtHeight.Text);
+
             var watch = new Stopwatch();
+
             watch.Start();
-            _walks = FindWalks(_walkWidth, _walkHeight);
+            await Task.Run(() => _walks = FindWalks(_walkWidth, _walkHeight)).ConfigureAwait(true);
             watch.Stop();
 
             var noun = (_walks.Count == 1 ? " walk " : " walks ");
             lblResults.Text = "Found " +
-                _walks.Count + noun + "in " +
-                watch.Elapsed.TotalSeconds.ToString("0.00") +
-                " seconds";
+                              _walks.Count + noun + "in " +
+                              watch.Elapsed.TotalSeconds.ToString("0.00") +
+                              " seconds";
 
             // Display the first walk.
             if (_walks.Count > 0)
@@ -95,8 +97,6 @@ namespace SelfAvoidingPaths
 
                 if (walks.Count % 1000 == 0)
                 {
-                    lblResults.Text = "... " +
-                        walks.Count.ToString() + " ...";
                     Application.DoEvents();
                 }
             }
@@ -141,7 +141,7 @@ namespace SelfAvoidingPaths
 
         private void DisplayWalk(int walkNum)
         {
-            lblWalkNum.Text = "Walk " + walkNum.ToString();
+            lblWalkNum.Text = "Walk " + walkNum;
             using (Pen pen = new Pen(Color.Blue, 2))
             {
                 Bitmap bm = DrawWalk(_walks[walkNum],
