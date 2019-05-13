@@ -37,6 +37,7 @@
             this.lblResults = new System.Windows.Forms.Label();
             this.trkWalk = new System.Windows.Forms.TrackBar();
             this.lblWalkNum = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picCanvas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkWalk)).BeginInit();
             this.SuspendLayout();
@@ -89,7 +90,7 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(72, 38);
+            this.btnGenerate.Location = new System.Drawing.Point(35, 47);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(75, 23);
             this.btnGenerate.TabIndex = 5;
@@ -122,12 +123,23 @@
             this.lblWalkNum.Size = new System.Drawing.Size(0, 13);
             this.lblWalkNum.TabIndex = 8;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(116, 47);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 9;
+            this.button1.Text = "Terminate";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Terminate_Click);
+            // 
             // WalksForm
             // 
             this.AcceptButton = this.btnGenerate;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(454, 241);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.lblWalkNum);
             this.Controls.Add(this.trkWalk);
             this.Controls.Add(this.lblResults);
@@ -157,6 +169,7 @@
         private System.Windows.Forms.Label lblResults;
         private System.Windows.Forms.TrackBar trkWalk;
         private System.Windows.Forms.Label lblWalkNum;
+        private System.Windows.Forms.Button button1;
     }
 }
 

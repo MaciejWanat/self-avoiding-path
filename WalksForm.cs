@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SelfAvoidingPaths
@@ -19,6 +20,7 @@ namespace SelfAvoidingPaths
 
         private List<List<Point>> _walks;
         private int _walkWidth, _walkHeight;
+        private CancellationTokenSource _cts;
 
         private async void BtnGenerate_Click(object sender, EventArgs e)
         {
@@ -35,8 +37,11 @@ namespace SelfAvoidingPaths
 
             var watch = new Stopwatch();
 
+            _cts = new CancellationTokenSource();
+            var ct = _cts.Token;
+
             watch.Start();
-            await Task.Run(() => _walks = FindWalks(_walkWidth, _walkHeight)).ConfigureAwait(true);
+            await Task.Run(() => _walks = FindWalks(_walkWidth, _walkHeight, ct)).ConfigureAwait(true);
             watch.Stop();
 
             var noun = (_walks.Count == 1 ? " walk " : " walks ");
@@ -45,11 +50,10 @@ namespace SelfAvoidingPaths
                               watch.Elapsed.TotalSeconds.ToString("0.00") +
                               " seconds";
 
-            // Display the first walk.
             if (_walks.Count > 0)
             {
                 DisplayWalk(0);
-                if (_walks.Count > 1)
+                if (_walks.Count >= 1)
                 {
                     trkWalk.Maximum = _walks.Count - 1;
                     trkWalk.Value = 0;
@@ -62,7 +66,7 @@ namespace SelfAvoidingPaths
         }
 
         // Generate all self-avoiding walks.
-        private List<List<Point>> FindWalks(int width, int height)
+        private List<List<Point>> FindWalks(int width, int height, CancellationToken ct)
         {
             List<List<Point>> walks = new List<List<Point>>();
 
@@ -77,28 +81,33 @@ namespace SelfAvoidingPaths
             currentWalk.Push(new Point(0, 0));
             visited[0, 0] = true;
 
-            // Search for walks.
-            FindWalks(numPoints, walks, currentWalk,
-                0, 0, width, height, visited);
-            return walks;
+            try
+            {
+                // Search for walks.
+                FindWalks(numPoints, walks, currentWalk,
+                    0, 0, width, height, visited, ct);
+                return walks;
+            }
+            catch (TaskCanceledException)
+            {
+                return walks;
+            }
         }
 
         // Extend the walk that is at (current_x, current_y).
         private void FindWalks(int numPoints,
             List<List<Point>> walks, Stack<Point> currentWalk,
             int currentX, int currentY,
-            int width, int height, bool[,] visited)
+            int width, int height, bool[,] visited, CancellationToken ct)
         {
+            if (ct.IsCancellationRequested)
+                throw new TaskCanceledException();
+
             // If we have visited every position,
             // then this is a complete walk.
             if (currentWalk.Count == numPoints)
             {
                 walks.Add(currentWalk.ToList());
-
-                if (walks.Count % 1000 == 0)
-                {
-                    Application.DoEvents();
-                }
             }
             else
             {
@@ -124,7 +133,7 @@ namespace SelfAvoidingPaths
                     currentWalk.Push(point);
 
                     FindWalks(numPoints, walks, currentWalk,
-                        point.X, point.Y, width, height, visited);
+                        point.X, point.Y, width, height, visited, ct);
 
                     // We're done visiting this point.
                     visited[point.X, point.Y] = false;
@@ -151,6 +160,11 @@ namespace SelfAvoidingPaths
                     Color.White, Brushes.Green, pen);
                 picCanvas.Image = bm;
             }
+        }
+
+        private void Terminate_Click(object sender, EventArgs e)
+        {
+            _cts.Cancel();
         }
 
         // Draw a walk.
