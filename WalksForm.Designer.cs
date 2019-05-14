@@ -39,6 +39,7 @@
             this.lblTotal = new System.Windows.Forms.Label();
             this.cbFixedSideSize = new System.Windows.Forms.CheckBox();
             this.cbVisualize = new System.Windows.Forms.CheckBox();
+            this.lblApprox = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picCanvas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkWalk)).BeginInit();
             this.SuspendLayout();
@@ -148,12 +149,21 @@
             this.cbVisualize.Text = "Visualize";
             this.cbVisualize.UseVisualStyleBackColor = true;
             // 
+            // lblApprox
+            // 
+            this.lblApprox.AutoSize = true;
+            this.lblApprox.Location = new System.Drawing.Point(-2, 215);
+            this.lblApprox.Name = "lblApprox";
+            this.lblApprox.Size = new System.Drawing.Size(0, 13);
+            this.lblApprox.TabIndex = 13;
+            // 
             // WalksForm
             // 
             this.AcceptButton = this.btnGenerate;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(482, 241);
+            this.Controls.Add(this.lblApprox);
             this.Controls.Add(this.cbVisualize);
             this.Controls.Add(this.cbFixedSideSize);
             this.Controls.Add(this.lblTotal);
@@ -187,6 +197,7 @@
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.CheckBox cbFixedSideSize;
         private System.Windows.Forms.CheckBox cbVisualize;
+        private System.Windows.Forms.Label lblApprox;
     }
 }
 

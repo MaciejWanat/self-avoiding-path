@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,11 +17,14 @@ namespace SelfAvoidingPaths
         public WalksForm()
         {
             InitializeComponent();
+            _ratio = GetApproximatedRatio(14);
         }
 
+        private const string NumFormat = "N0";
         private List<List<Point>> _walks;
         private int _pathLength;
         private CancellationTokenSource _cts;
+        private double _ratio;
 
         private async void BtnGenerate_Click(object sender, EventArgs e)
         {
@@ -30,9 +34,14 @@ namespace SelfAvoidingPaths
             btnGenerate.Enabled = false;
             trkWalk.Visible = false;
             picCanvas.Image = null;
+            lblApprox.Text = "";
             Cursor = Cursors.WaitCursor;
 
             _pathLength = int.Parse(txtPathLength.Text);
+            if (_pathLength > 20)
+            {
+                lblApprox.Text = $"Approximated (coord system): {Math.Round((Math.Pow(4, _pathLength) - 4) * _ratio).ToString(NumFormat, CultureInfo.InvariantCulture)}";
+            }
 
             var watch = new Stopwatch();
 
@@ -45,11 +54,11 @@ namespace SelfAvoidingPaths
 
             var noun = (_walks.Count == 1 ? " walk " : " walks ");
             lblResults.Text = "Found " +
-                              _walks.Count + noun + "in " +
+                              _walks.Count.ToString(NumFormat, CultureInfo.InvariantCulture) + noun + "in " +
                               watch.Elapsed.TotalSeconds.ToString("0.00") +
                               " seconds";
 
-            lblTotal.Text = $"Total paths in coordinate system: {_walks.Count * 4}";
+            lblTotal.Text = $"Total paths in coordinate system: {(_walks.Count * 4 - 4).ToString(NumFormat, CultureInfo.InvariantCulture)}";
 
             if (cbVisualize.Checked)
             {
@@ -65,7 +74,6 @@ namespace SelfAvoidingPaths
                 }
             }
 
-            _walks = new List<List<Point>>();
             btnGenerate.Enabled = true;
             Cursor = Cursors.Default;
         }
@@ -89,6 +97,7 @@ namespace SelfAvoidingPaths
                 // Search for walks.
                 FindWalks(walks, currentWalk,
                     0, 0, side, pathLength, visited, ct);
+
                 return walks;
             }
             catch (TaskCanceledException)
@@ -147,6 +156,20 @@ namespace SelfAvoidingPaths
         private void TrkWalk_Scroll(object sender, EventArgs e)
         {
             DisplayWalk(trkWalk.Value);
+        }
+
+        private double GetApproximatedRatio(int n)
+        {
+            var allPaths = Math.Pow(4, n) - 4;
+
+            _cts = new CancellationTokenSource();
+            var ct = _cts.Token;
+
+            var selfAvoiding = FindWalks(n, ct).Count * 4 - 4;
+
+            var ratio = (double) selfAvoiding / allPaths;
+
+            return ratio;
         }
 
         private void DisplayWalk(int walkNum)
