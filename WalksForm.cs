@@ -38,7 +38,7 @@ namespace SelfAvoidingPaths
             Cursor = Cursors.WaitCursor;
 
             _pathLength = int.Parse(txtPathLength.Text);
-            if (_pathLength > 20)
+            if (_pathLength > 16)
             {
                 lblApprox.Text = $"Approximated (coord system): {Math.Round((Math.Pow(4, _pathLength) - 4) * _ratio).ToString(NumFormat, CultureInfo.InvariantCulture)}";
             }
